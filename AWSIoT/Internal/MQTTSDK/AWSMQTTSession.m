@@ -18,6 +18,8 @@
 #import "AWSMQTTDecoder.h"
 #import "AWSMQTTEncoder.h"
 #import "AWSMQttTxFlow.h"
+#import "AWSIoTMessage.h"
+#import "AWSIoTMessage+AWSMQTTMessage.h"
 
 @interface AWSMQTTSession () <AWSMQTTDecoderDelegate,AWSMQTTEncoderDelegate>  {
     AWSMQTTSessionStatus    status;  //Current status of the session. Can be one of the values specified in the MQTTSessionStatus enum
@@ -514,7 +516,7 @@
     NSRange range = NSMakeRange(2 + topicLength, [data length] - topicLength - 2);
     data = [data subdataWithRange:range];
     if ([msg qos] == 0) {
-        [_delegate session:self newMessage:data onTopic:topic];
+        [_delegate session:self newMessage:msg onTopic:topic];
         if(_messageHandler){
             _messageHandler(data, topic);
         }
@@ -530,8 +532,7 @@
         }
         data = [data subdataWithRange:NSMakeRange(2, [data length] - 2)];
         if ([msg qos] == 1) {
-            [_delegate session:self newMessage:data onTopic:topic];
-            
+            [_delegate session:self newMessage:msg onTopic:topic];
             if(_messageHandler){
                 _messageHandler(data, topic);
             }

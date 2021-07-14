@@ -91,10 +91,11 @@ class AWSIoTDataManagerQoSTests: XCTestCase {
         wait(for: [hasConnectedBroker1], timeout: defaultTimeout)
         
         let broker1ReceivedData = expectation(description: "Should get retained message")
-        iotDataManagerBroker1.subscribe(toTopic: topicName, qoS: .messageDeliveryAttemptedExactlyOnce) { (data) in
+        let messageCallback: AWSIoTMQTTNewMessageBlock = { data in
             XCTAssertEqual(data.toUTF8String(), "This is a message we send once and only once")
             broker1ReceivedData.fulfill()
         }
+        iotDataManagerBroker1.subscribe(toTopic: topicName, qoS: .messageDeliveryAttemptedExactlyOnce, messageCallback: messageCallback)
 
         // Broker 2:
         // * Connects
@@ -146,10 +147,11 @@ class AWSIoTDataManagerQoSTests: XCTestCase {
         wait(for: [hasConnectedBroker1], timeout: defaultTimeout)
         
         let broker1ReceivedData = expectation(description: "Should get retained message")
-        iotDataManagerBroker1.subscribe(toTopic: topicName, qoS: .messageDeliveryAttemptedAtLeastOnce) { (data) in
+        let messageCallback: AWSIoTMQTTNewMessageBlock = { data in
             XCTAssertEqual(data.toUTF8String(), "This is a message, sent once")
             broker1ReceivedData.fulfill()
         }
+        iotDataManagerBroker1.subscribe(toTopic: topicName, qoS: .messageDeliveryAttemptedAtLeastOnce, messageCallback: messageCallback)
         
         // Broker 2:
         // * Connects
