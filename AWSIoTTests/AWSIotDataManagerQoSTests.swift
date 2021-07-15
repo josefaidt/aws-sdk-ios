@@ -68,7 +68,7 @@ class AWSIoTDataManagerQoSTests: XCTestCase {
                                    forKey: key)
     }
 
-    
+    #if MQTT_QOS2_ENABLED
     func testSubscribeQos2_SendQoS2Message() {
         let topicName = "SubscribeQoS2_SendQoS2"
         let messageToSend = "This is a message we send once and only once"
@@ -124,7 +124,7 @@ class AWSIoTDataManagerQoSTests: XCTestCase {
         iotDataManagerBroker2.disconnect()
         wait(for: [hasDisconnectedBroker1, hasDisconnectedBroker2], timeout: defaultTimeout)
     }
-    
+
     func testSubscribeQos1_SendQoS2Message() {
         let topicName = "SubscribeQoS1_SendQoS2"
         let messageToSend = "This is a message, sent once"
@@ -180,6 +180,7 @@ class AWSIoTDataManagerQoSTests: XCTestCase {
         iotDataManagerBroker2.disconnect()
         wait(for: [hasDisconnectedBroker1, hasDisconnectedBroker2], timeout: defaultTimeout)
     }
+    #endif
 }
 
 
