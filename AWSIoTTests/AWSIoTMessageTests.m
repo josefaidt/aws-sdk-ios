@@ -52,11 +52,16 @@
     AWSIoTMessage *iotMessage = [[AWSIoTMessage alloc] initWithMQTTMessage:mqttMessage];
     XCTAssertNotNil(iotMessage);
 
+    NSString *decodedText = [[NSString alloc] initWithData:iotMessage.messageData
+                                                  encoding:NSUTF8StringEncoding];
+
     NSLog(@"Topic: %@", iotMessage.topic);
-    NSLog(@"Message: %@", iotMessage.message);
+    NSLog(@"Message: '%@'", iotMessage.message);
+    NSLog(@"Decoded Text: '%@'", decodedText);
 
     XCTAssertTrue([iotMessage.topic isEqualToString:topic]);
     XCTAssertTrue([iotMessage.message isEqualToString:message]);
+    XCTAssertTrue([decodedText isEqualToString:message]);
     XCTAssertFalse((iotMessage.retainFlag));
     XCTAssertFalse((iotMessage.isDuplicate));
     XCTAssertTrue(iotMessage.qos == qos);

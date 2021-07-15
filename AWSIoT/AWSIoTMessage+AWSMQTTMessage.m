@@ -47,12 +47,12 @@
                                                 encoding:NSUTF8StringEncoding];
         self.topic = topic;
 
-        NSRange messageRange = NSMakeRange(2 + topicLength, data.length - topicLength - 2);
+        NSRange messageRange = NSMakeRange(4 + topicLength, data.length - topicLength - 4);
         NSData *messageData = [data subdataWithRange:messageRange];
         self.messageData = messageData;
 
         if (messageData.length > 2) {
-            NSRange textRange = NSMakeRange(2, messageData.length - 2);
+            NSRange textRange = NSMakeRange(0, messageData.length);
             NSData *textData = [messageData subdataWithRange:textRange];
             NSString *messageText = [[NSString alloc] initWithData:textData
                                                           encoding:NSUTF8StringEncoding];
