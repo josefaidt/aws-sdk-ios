@@ -70,7 +70,8 @@ class AWSIoTDataManagerRetainTests: XCTestCase {
                                    with: mqttConfig,
                                    forKey: key)
     }
-    
+
+    #if MQTT_RETAIN_ENABLED
     func testRetainMessageOnTopic() {
         let defaultTopic = "testRetainMessage"
 
@@ -131,5 +132,6 @@ class AWSIoTDataManagerRetainTests: XCTestCase {
         wait(for: [hasDisconnectedBroker2], timeout: defaultTimeout)
         
     }
+    #endif
 
 }
