@@ -58,14 +58,78 @@
     NSLog(@"Topic: %@", iotMessage.topic);
     NSLog(@"Message: '%@'", iotMessage.message);
     NSLog(@"Decoded Text: '%@'", decodedText);
+    
+    XCTAssertEqual(iotMessage.message.length, message.length);
+    XCTAssertEqual(iotMessage.messageData.length, payload.length);
 
-    XCTAssertTrue([iotMessage.topic isEqualToString:topic]);
-    XCTAssertTrue([iotMessage.message isEqualToString:message]);
+    XCTAssertEqualObjects(iotMessage.messageData, payload);
+
+    XCTAssertEqualObjects(iotMessage.topic, topic);
+    XCTAssertEqualObjects(iotMessage.message, message);
     XCTAssertTrue([decodedText isEqualToString:message]);
     XCTAssertFalse((iotMessage.retainFlag));
     XCTAssertFalse((iotMessage.isDuplicate));
     XCTAssertTrue(iotMessage.qos == qos);
     XCTAssertTrue(iotMessage.type == AWSIoTMQTTMessageTypePublish);
+}
+
+- (void)testMQTTMessageConversionToIoTMessageWithLongMessage {
+    // This is an example of a functional test case.
+    // Use XCTAssert and related functions to verify your tests produce the correct results.
+
+    NSString *topic = @"x/y";
+
+    //
+    // Now allocate a max-sized publish message (128KB) and fill it with random data.
+    // Note that we use a size just under 128KB to accommodate the WebSocket framing.
+    //
+    NSString *message = [self generateRandomStringOfLength:(NSUInteger)(128 * 1024)-16];
+    NSData *payload = [message dataUsingEncoding:NSUTF8StringEncoding];
+
+    AWSIoTMQTTQoS qos = AWSIoTMQTTQoSMessageDeliveryAttemptedAtMostOnce;
+
+    AWSMQTTMessage *mqttMessage = [AWSMQTTMessage publishMessageWithData:payload
+                                                                 onTopic:topic
+                                                                     qos:qos
+                                                                   msgId:0
+                                                              retainFlag:NO
+                                                                 dupFlag:NO];
+    XCTAssertNotNil(mqttMessage);
+    XCTAssertNotNil(mqttMessage.data);
+    XCTAssertFalse((mqttMessage.retainFlag));
+    XCTAssertFalse((mqttMessage.isDuplicate));
+
+    AWSIoTMessage *iotMessage = [[AWSIoTMessage alloc] initWithMQTTMessage:mqttMessage];
+    XCTAssertNotNil(iotMessage);
+
+    NSString *decodedText = [[NSString alloc] initWithData:iotMessage.messageData
+                                                  encoding:NSUTF8StringEncoding];
+
+    NSLog(@"Topic: %@", iotMessage.topic);
+    NSLog(@"Message: '%@'", iotMessage.message);
+    NSLog(@"Decoded Text: '%@'", decodedText);
+
+    XCTAssertEqual(iotMessage.message.length, message.length);
+    XCTAssertEqual(iotMessage.messageData.length, payload.length);
+
+    XCTAssertEqualObjects(iotMessage.messageData, payload);
+
+    XCTAssertEqualObjects(iotMessage.topic, topic);
+    XCTAssertEqualObjects(iotMessage.message, message);
+    XCTAssertTrue([decodedText isEqualToString:message]);
+    XCTAssertFalse((iotMessage.retainFlag));
+    XCTAssertFalse((iotMessage.isDuplicate));
+    XCTAssertTrue(iotMessage.qos == qos);
+    XCTAssertTrue(iotMessage.type == AWSIoTMQTTMessageTypePublish);
+}
+
+- (NSString *)generateRandomStringOfLength: (NSUInteger)length {
+    NSMutableString *rc = [NSMutableString stringWithCapacity: length];
+    NSString *letters = @"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_=+()%!@#$%^&*/\\:;,.'{}~";
+    for (NSUInteger i=0; i<length; i++) {
+        [rc appendFormat: @"%C", [letters characterAtIndex: arc4random_uniform((unsigned int)[letters length])]];
+    }
+    return rc;
 }
 
 @end
